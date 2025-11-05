@@ -18,7 +18,6 @@ public class R2045_DECODE_TeleOp extends OpMode {
 
     @Override
     public void init() {
-
         drivePower.init(hardwareMap);
 
         // Actuator Configuration and Hardware Mapping
@@ -39,15 +38,29 @@ public class R2045_DECODE_TeleOp extends OpMode {
         // REV UltraPlanetary Motors
         right_lifter = hardwareMap.get(DcMotorEx.class, "right_lifter");
         left_lifter = hardwareMap.get(DcMotorEx.class, "left_lifter");
-
-    }
+    } // end of init() function
 
     @Override
     public void loop() {
+        // Control Variable Declaration
+
+        double right_trigger = -gamepad1.right_trigger;
+        double left_trigger = gamepad1.left_trigger;
+
+        // Intake Control
+
+        if (right_trigger > left_trigger) {
+            intake.setPower(right_trigger);
+        } else if (left_trigger > right_trigger) {
+            intake.setPower(left_trigger);
+        } else {
+            intake.setPower(0);
+        } // end of conditional
+
         forward = gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
         rotate = gamepad1.right_stick_x;
 
         drivePower.driveFieldRelative(forward, strafe, rotate);
-    }
-}
+    } // end of loop() function
+} // end of opMode()
