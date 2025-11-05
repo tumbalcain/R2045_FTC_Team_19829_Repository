@@ -8,6 +8,25 @@ import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+// GUIDE TO NEW PROGRAMMERS ON HOW TO USE THIS PIPELINE IN OPMODES
+
+// STEP 1: IMPORT THIS PIPELINE USING THE CODE BELOW
+// import org.firstinspires.ftc.teamcode.R2045.pipelines.ReusableMecanum;
+
+// STEP 2: INITIALIZE THE PIPELINE IN THE OPMODE
+// DO NOT ADD THE CODE INSIDE THE INIT() FUNCTION
+// ReusableMecanum drivePower = new ReusableMecanum();
+// double forward, strafe, rotate;
+
+// STEP 3: INITIALIZE THE DRIVEBASE CONTROL IN THE LOOP() FUNCTION
+// EXAMPLE CODE:
+// forward = gamepad1.left_stick_y;
+// strafe = gamepad1.left_stick_x;
+// rotate = gamepad1.right_stick_x;
+
+// STEP 4: IMPLEMENT THE driveFieldRelative() FUNCTION
+// drivePower.driveFieldRelative(forward, strafe, rotate);
+
 public class ReusableMecanum {
 
     private DcMotorEx front_right_drive, front_left_drive, back_right_drive, back_left_drive;
