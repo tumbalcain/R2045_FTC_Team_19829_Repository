@@ -16,12 +16,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AprilTagWebcam {
+
+    // List, VisionPortal, AprilTag, and Telemetry Declaration
+
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
 
     private List<AprilTagDetection> detectedTags = new ArrayList<>();
 
     private Telemetry telemetry;
+
+    // AprilTag and VisionPortal Initilization
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -41,5 +46,37 @@ public class AprilTagWebcam {
         builder.addProcessor(aprilTagProcessor);
 
         visionPortal = builder.build();
+    }
+
+    // Update Function
+
+    public void update() {
+        detectedTags = aprilTagProcessor.getDetections();
+    }
+
+    // List of Detected AprilTags
+
+    public List<AprilTagDetection> getDetectedTags() {
+        return detectedTags;
+    }
+
+    // Specific AprilTag Id Fetch Function
+
+    public AprilTagDetection getTagBySpecificId(int id) {
+        for (AprilTagDetection detection : detectedTags) {
+            if (detection.id == id) {
+                return detection;
+            }
+        }
+
+        return null;
+    }
+
+    // VisionPortal Stop Function
+
+    public void stop() {
+        if (visionPortal != null) {
+            visionPortal.close();
+        }
     }
 }
