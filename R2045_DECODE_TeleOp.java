@@ -57,6 +57,21 @@ public class R2045_DECODE_TeleOp extends OpMode {
             intake.setPower(0);
         } // end of conditional
 
+        // Lifter Control
+
+        if (gamepad1.dpad_up) {
+            right_lifter.setPower(1);
+            left_lifter.setPower(1);
+        } else if (gamepad1.dpad_down) {
+            right_lifter.setPower(-1);
+            left_lifter.setPower(-1);
+        } else {
+            right_lifter.setPower(0);
+            left_lifter.setPower(0);
+        }
+
+        // Drivebase Control
+
         forward = gamepad1.left_stick_y;
         strafe = gamepad1.left_stick_x;
         rotate = gamepad1.right_stick_x;
