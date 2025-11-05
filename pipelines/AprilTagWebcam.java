@@ -1,13 +1,19 @@
-package main.java.org.firstinspires.ftc.teamcode.R2045.pipelines;
+package org.firstinspires.ftc.teamcode.R2045.pipelines;
+
+import android.util.Size;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
-import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AprilTagWebcam {
     private AprilTagProcessor aprilTagProcessor;
@@ -17,7 +23,7 @@ public class AprilTagWebcam {
 
     private Telemetry telemetry;
 
-    public void init(HardwareMap hardwareMap, Telemetry, telemetry) {
+    public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
 
         aprilTagProcessor = new AprilTagProcessor.Builder()
