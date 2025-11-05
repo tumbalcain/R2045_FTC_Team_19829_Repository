@@ -68,6 +68,19 @@ public class R2045_DECODE_TeleOp extends OpMode {
         } else {
             right_lifter.setPower(0);
             left_lifter.setPower(0);
+        } // end of conditional
+
+        // Shooter Control
+
+        if (gamepad1.y) {
+            right_shooter.setPower(1);
+            left_shooter.setPower(1);
+        } else if (gamepad1.a) {
+            right_shooter.setPower(-1);
+            left_shooter.setPower(-1);
+        } else {
+            right_shooter.setPower(0);
+            left_shooter.setPower(0);
         }
 
         // Drivebase Control
