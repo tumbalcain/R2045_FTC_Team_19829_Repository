@@ -15,6 +15,22 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+// GUIDE TO NEW PROGRAMMERS ON HOW TO USE THIS PIPELINE IN OPMODES
+
+// STEP 1: IMPORT THIS PIPELINE USING THE CODE BELOW
+// import org.firstinspires.ftc.teamcode.R2045.pipelines.AprilTagWebcam;
+
+// STEP 2: INITIALIZE THE PIPELINE IN THE OPMODE
+// DO NOT ADD THE CODE INSIDE THE INIT() FUNCTION
+// AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+
+// STEP 3: ADD THE CODE BELOW INSIDE THE INIT() FUNCTION
+// apriltagWebcam.init(hardwareMap, telemetry);
+
+// STEP 4: ADD THE CODE BELOW INSIDE THE LOOP() FUNCTION
+// aprilTagWebcam.update();
+
+
 public class AprilTagWebcam {
 
     // List, VisionPortal, AprilTag, and Telemetry Declaration
