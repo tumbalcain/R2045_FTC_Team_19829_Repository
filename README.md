@@ -22,6 +22,9 @@
     <br />
     <a href="https://github.com/tumbalcain/R2045_FTC_Team_19829_Repository"><strong>Explore the docs »</strong></a>
     <br />
+  
+  <!-- INSERT INSTAGRAM, WEBSITE, AND SPONSOR PROPOSAL LINK -->
+
   </p>
 </div>
 
@@ -53,6 +56,8 @@
 >Previous seasons' opmode and folder are stored in the <a>archive</a> folder.
 >
 > Current FTC Season: DECODE (2025-2026)
+
+<img src="https://www.firstinspires.org/hs-fs/hubfs/image-library/web/ftc_decode_1240x860.webp?width=630&height=419&name=ftc_decode_1240x860.webp"/>
 
 <!-- GETTING STARTED -->
 ## Getting Started
