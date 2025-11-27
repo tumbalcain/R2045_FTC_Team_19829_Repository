@@ -177,7 +177,7 @@ Project Link: [https://github.com/tumbalcain/R2045_FTC_Team_19829_Repository](ht
 [issues-shield]: https://img.shields.io/github/issues/tumbalcain/R2045_FTC_Team_19829_Repository.svg?style=for-the-badge
 [issues-url]: https://github.com/tumbalcain/R2045_FTC_Team_19829_Repository/issues
 [license-shield]: https://img.shields.io/github/license/tumbalcain/R2045_FTC_Team_19829_Repository.svg?style=for-the-badge
-[license-url]: https://github.com/tumbalcain/R2045_FTC_Team_19829_Repository/blob/master/LICENSE
+[license-url]: https://github.com/tumbalcain/R2045_FTC_Team_19829_Repository/blob/master/LICENSE.txt
 
 <!-- [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/linkedin_username -->
