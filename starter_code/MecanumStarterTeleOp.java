@@ -6,8 +6,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import org.firstinspires.ftc.teamcode.R2045.pipelines.ReusableMecanum;
 
-@TeleOp(name="MecanumStarter", group="StarterCode")
-public class MecanumStarter extends OpMode {
+@TeleOp(name="MecanumTeleOp", group="StarterCode")
+public class MecanumStarterTeleOp extends OpMode {
 
     // Class Initialization
 
