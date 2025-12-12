@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.R2045;
+package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
