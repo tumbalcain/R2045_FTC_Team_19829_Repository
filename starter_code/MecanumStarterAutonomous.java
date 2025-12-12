@@ -47,6 +47,66 @@ public class MecanumStarterAutonomous extends LinearOpMode {
         // Enter Path Implementation here
         Action path = drive.actionBuilder(beginPose)
 
+                ///////////////////////////////////////////////////////////////////////////////
+                ///                         PATH COMMANDS EXAMPLES                          ///
+                ///////////////////////////////////////////////////////////////////////////////
+        
+                // Move forward 10 inches
+                .forward(10)
+
+                // Move backward 10 inches
+                .back(10)
+
+                // Strafe left 10 inches
+                .strafeLeft(10)
+
+                // Strafe right 10 inches
+                .strafeRight(10)
+
+                // strafeTo is a shorthand for lineToConstantHeading()
+                .strafeTo(new Vector(10, 10))
+
+                // The same.
+                .lineTo(new Vector(10, 10))
+
+                // The same as lineTo adn strafeTo
+                .lineToConstantHeading(new Pose2d(10, 10, Math.toRadians(90)))
+
+                // Robot moves to the specified coordinates while linearly
+                // Interpolating between the start heading and a specified end heading.
+                .lineToLinearHeading(new Pose2d(10, 10, Math.toRadians(90)))
+
+                // Robot moves to the specified coordinates while spline
+                // interpolating between the start heading and a specified end heading.
+                .lineToSplineHeading(new Pose2d(10, 10, Math.toRadians(90)))
+
+                // Robot moves to the specified coordinates in a spline path
+                // while following a tangent heading interpolator.
+                .splineTo(new Vector2d(10, 10), Math.toRadians(90))
+
+                // Robot moves to the specified coordinates in a spline path
+                // while keeping the heading constant.
+                // The robot maintains the heading it starts at throughout the trajectory
+                .splineToConstantHeading(new Vector2d(10, 10), Math.toRadians(90))
+
+                // Robot moves to the specified coordinates in a spline path
+                // while separately linearly interpolating the heading
+                //
+                // The heading interpolates to the heading specified in `endPose`.
+                // Setting `endTangent` affects the shape of the spline path itself.
+
+                // 🚨  Will cause PathContinuityException's!! 🚨
+                // Use splineToSplineHeading() if you are chaining these calls
+                .splineToLinearHeading(new Pose2d(40, 40, Math.toRadians(90)), Math.toRadians(0))
+
+
+                // Robot moves to the specified coordinates in a spline path
+                // while separately spline interpolating the heading
+                //
+                // The heading interpolates to the heading specified in `endPose`.
+                // Setting `endTangent` affects the shape of the spline path itself.
+                .splineToSplineHeading(new Pose2d(40, 40, Math.toRadians(90)), Math.toRadians(0))
+
                 // Execute InstantFunction
                 .stopAndAdd(new OpenClaw(0))
 
