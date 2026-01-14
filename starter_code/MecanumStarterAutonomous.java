@@ -64,10 +64,10 @@ public class MecanumStarterAutonomous extends LinearOpMode {
                 .strafeRight(10)
 
                 // strafeTo is a shorthand for lineToConstantHeading()
-                .strafeTo(new Vector(10, 10))
+                .strafeTo(new Vector2d(10, 10))
 
                 // The same.
-                .lineTo(new Vector(10, 10))
+                .lineTo(new Vector2d(10, 10))
 
                 // The same as lineTo adn strafeTo
                 .lineToConstantHeading(new Pose2d(10, 10, Math.toRadians(90)))
