@@ -12,6 +12,26 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
+// NOTE FOR PROGRAMMERS:
+//
+// Configure the drivebase actuators using these names:
+// Left front wheel = leftFront
+// Left back wheel = leftBack
+// Right front wheel = rightFront
+// Right back wheel = rightBack
+//
+// ALSO ANOTHER NOTE:
+// For some reason, you can't use several path commands because the library is tweaking
+// List of path commands you can't use:
+// .forward
+// .back
+// .strafeLeft
+// .strafeRight
+// .lineTo
+// .lineToConstantHeading
+// .lineToLinearHeading
+// .lineToSplineHeading
+
 @Autonomous(name="MecanumAutonomous", group="StarterCode")
 public class MecanumStarterAutonomous extends LinearOpMode {
 
@@ -52,33 +72,33 @@ public class MecanumStarterAutonomous extends LinearOpMode {
                 ///////////////////////////////////////////////////////////////////////////////
         
                 // Move forward 10 inches
-                .forward(10)
+                // .forward(10)
 
                 // Move backward 10 inches
-                .back(10)
+                // .back(10)
 
                 // Strafe left 10 inches
-                .strafeLeft(10)
+                // .strafeLeft(10)
 
                 // Strafe right 10 inches
-                .strafeRight(10)
+                // .strafeRight(10)
 
                 // strafeTo is a shorthand for lineToConstantHeading()
                 .strafeTo(new Vector2d(10, 10))
 
                 // The same.
-                .lineTo(new Vector2d(10, 10))
+                // .lineTo(new Vector2d(10, 10))
 
                 // The same as lineTo adn strafeTo
-                .lineToConstantHeading(new Pose2d(10, 10, Math.toRadians(90)))
+                // .lineToConstantHeading(new Pose2d(10, 10, Math.toRadians(90)))
 
                 // Robot moves to the specified coordinates while linearly
                 // Interpolating between the start heading and a specified end heading.
-                .lineToLinearHeading(new Pose2d(10, 10, Math.toRadians(90)))
+                // .lineToLinearHeading(new Pose2d(10, 10, Math.toRadians(90)))
 
                 // Robot moves to the specified coordinates while spline
                 // interpolating between the start heading and a specified end heading.
-                .lineToSplineHeading(new Pose2d(10, 10, Math.toRadians(90)))
+                // .lineToSplineHeading(new Pose2d(10, 10, Math.toRadians(90)))
 
                 // Robot moves to the specified coordinates in a spline path
                 // while following a tangent heading interpolator.
@@ -109,7 +129,6 @@ public class MecanumStarterAutonomous extends LinearOpMode {
 
                 // Execute InstantFunction
                 .stopAndAdd(new OpenClaw(0))
-
                 .build();
 
         Actions.runBlocking(new SequentialAction(path));
