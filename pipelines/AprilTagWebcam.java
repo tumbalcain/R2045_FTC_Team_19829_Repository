@@ -88,6 +88,38 @@ public final class AprilTagWebcam {
         return null;
     } // end of getTagBySpecificId() function
 
+    // Specific AprilTag Id Distance Fetch Function
+
+    public Double getDistanceToTag(int id) {
+        AprilTagDetection tag = getTagBySpecificId(id);
+        if (tag == null) return null;
+        return tag.ftcPose.z;
+    } // end of getDistanceToTag() function
+
+    // Specific AprilTag Id Bearing Fetch Function
+
+    public Double getBearingToTag(int id) {
+        AprilTagDetection tag = getTagBySpecificId(id);
+        if (tag == null) return null;
+        return tag.ftcPose.bearing;
+    } // end of getBearingToTag() function
+
+    // Specific AprilTag Id Offset Fetch Function
+
+    public Double getOffsetToTag(int id) {
+        AprilTagDetection tag = getTagBySpecificId(id);
+        if (tag == null) return null;
+        return tag.ftcPose.x;
+    } // end of getOffsetToTag() function
+
+    // Specific AprilTag Id Yaw Fetch Function
+
+    public Double getYawToTag(int id) {
+        AprilTagDetection tag = getTagBySpecificId(id);
+        if (tag == null) return null;
+        return tag.ftcPose.yaw;
+    } // end of getYawToTag() function
+
     // Telemetry Display Function
 
     public void displayDetectionTelemetry(AprilTagDetection detectedId) {
