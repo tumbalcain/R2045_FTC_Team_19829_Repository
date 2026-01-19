@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -117,6 +118,11 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         Pose2d beginPose = new Pose2d(11.57, -62.11, Math.toRadians(90.00));
         Pose2d endSPOne = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
         Pose2d endSPTwo = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        // Declaration variables
+        Pose2d beginPose = new Pose2d(11.57, -62.11, Math.toRadians(90.00));
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
         waitForStart();
@@ -127,6 +133,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         // Enter Path Implementation here
         Action pathSPOne = drive.actionBuilder(beginPose)
                 // Turret tracking apriltag from the beginning to the end of trajectory
+        Action path = drive.actionBuilder(beginPose)
                 .splineTo(new Vector2d(28.50, -36.92), Math.toRadians(0.00)) // Spawn to Spike Mark 1
                 .splineTo(new Vector2d(53.06, -36.92), Math.toRadians(0.00)) // Spike Mark 1 AIS
                 .splineTo(new Vector2d(47.97, -23.42), Math.toRadians(180.00)) // Turn to LZ
@@ -164,5 +171,8 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         ));
         // end of runBlocking() function
     } // end of runOpMode() function
+
+        Actions.runBlocking(new SequentialAction(path));
+    }
 
 } // end of loop() function
