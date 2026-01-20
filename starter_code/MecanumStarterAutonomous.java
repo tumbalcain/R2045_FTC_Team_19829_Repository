@@ -129,6 +129,9 @@ public class MecanumStarterAutonomous extends LinearOpMode {
 
                 // Execute InstantFunction
                 .stopAndAdd(new OpenClaw(0))
+                // Execute InstantFunction
+                .stopAndAdd(new OpenClaw(0))
+
                 .build();
 
         Actions.runBlocking(new SequentialAction(path));
