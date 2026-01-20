@@ -31,8 +31,8 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
             // NOTE TO PROGRAMMERS & MECHANIC:
             // AS OF 19/01/26, THIS DATA IS TEMPORARY AND SERVE AS A DUMMY.
             // WE NEED SHOOTER & HOOD TESTING AND CALIBRATION.
-            {10, 0.15, 0.65},
-            {20, 0.22, 0.72},
+            {10,  0.15, 0.65},
+            {20,  0.22, 0.72},
             {30, 0.30, 0.80},
             {40, 0.38, 0.90}
     }; // end of shotTable
@@ -40,7 +40,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     // Interpolation Function
     // a.k.a gay math
 
-    private double lerp(double a, double b, double t) {
+    private double lerp (double a, double b, double t) {
         return a + (b - a) * t;
     } // end of lerp
 
@@ -51,13 +51,13 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
             if (distance >= A[0] && distance < B[0]) {
                 double t = (distance - A[0]) / (B[0] - A[0]);
-                return new double[]{
+                return new double[] {
                         lerp(A[1], B[1], t),
                         lerp(A[2], B[2], t)
                 }; // end of return
             } // end of conditional
         } // end of for loop
-        return new double[]{shotTable[shotTable.length - 1][1], shotTable[shotTable.length - 1][2]};
+        return new double[] {shotTable[shotTable.length - 1][1], shotTable[shotTable.length - 1][2]};
     } // end of double
 
     Action autoAim = packet -> {
@@ -95,8 +95,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
                 started = true;
             } // end of conditional
 
-            // Testing required to identify the shooter duration
-            if (timer.milliseconds() >= 5000) {
+            if (timer.milliseconds() >= 2000) {
                 shooter.setPower(0.0);
                 return true;
             } // end of conditional
@@ -105,6 +104,20 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         } // end of boolean
     } // end of ShootBall
 
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        aprilTagWebcam.init(hardwareMap, telemetry);
+
+        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        turret = hardwareMap.get(Servo.class, "turret");
+        hood = hardwareMap.get(Servo.class, "hood");
+
+
+        // Declaration variables
+        Pose2d beginPose = new Pose2d(11.57, -62.11, Math.toRadians(90.00));
+        Pose2d endSPOne = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
+        Pose2d endSPTwo = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -128,6 +141,8 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
         // Enter Path Implementation here
         Action pathSPOne = drive.actionBuilder(beginPose)
+                // Turret tracking apriltag from the beginning to the end of trajectory
+        Action path = drive.actionBuilder(beginPose)
                 .splineTo(new Vector2d(28.50, -36.92), Math.toRadians(0.00)) // Spawn to Spike Mark 1
                 .splineTo(new Vector2d(53.06, -36.92), Math.toRadians(0.00)) // Spike Mark 1 AIS
                 .splineTo(new Vector2d(47.97, -23.42), Math.toRadians(180.00)) // Turn to LZ
@@ -150,6 +165,21 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
                 .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
                 .build();
         // end of pathSPThree
+
+        Action ShootBall;
+        Actions.runBlocking(new ParallelAction(
+                autoAim,
+                new SequentialAction(
+                    pathSPOne,
+                    new ShootBall(shooter),
+                    pathSPTwo,
+                    new ShootBall(shooter),
+                    pathSPThree,
+                    new ShootBall(shooter)
+                ) // end of SequentialAction
+        ));
+        // end of runBlocking() function
+    } // end of runOpMode() function
 
         Action ShootBall;
         Actions.runBlocking(new ParallelAction(
