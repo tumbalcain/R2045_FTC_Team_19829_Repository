@@ -121,8 +121,17 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
+        aprilTagWebcam.init(hardwareMap, telemetry);
+
+        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        turret = hardwareMap.get(Servo.class, "turret");
+        hood = hardwareMap.get(Servo.class, "hood");
+
+
         // Declaration variables
         Pose2d beginPose = new Pose2d(11.57, -62.11, Math.toRadians(90.00));
+        Pose2d endSPOne = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
+        Pose2d endSPTwo = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
         waitForStart();
@@ -172,7 +181,19 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         // end of runBlocking() function
     } // end of runOpMode() function
 
-        Actions.runBlocking(new SequentialAction(path));
-    }
-
+        Action ShootBall;
+        Actions.runBlocking(new ParallelAction(
+                autoAim,
+                new SequentialAction(
+                        pathSPOne,
+                        new ShootBall(shooter),
+                        pathSPTwo,
+                        new ShootBall(shooter),
+                        pathSPThree,
+                        new ShootBall(shooter)
+                ) // end of SequentialAction
+        ));
+        // end of runBlocking() function
+    } // end of runOpMode() function
 } // end of loop() function
+
