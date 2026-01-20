@@ -34,15 +34,7 @@
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
@@ -66,52 +58,15 @@
 <!-- GETTING STARTED -->
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+To get started using this repository, use the <a href="https://rr.brott.dev/docs/v1-0/installation/">FTC Roadrunner Quickstart</a> and <a href="https://developer.android.com/studio?utm_source=android-studio">Android Studio</a> for development.
 
+Roadrunner and FTC Resources:
+<ul>
+<li><a href="https://learnroadrunner.com/introduction.html">Roadrunner FTC</a></li>
+<li><a href="https://learnroadrunner.com/tools.html#road-runner-gui">RRPathGen (Path Trajectory Tool)</a></li>
+<li href="https://learnroadrunner.com/tools.html#meepmeep"><a>MeepMeep (Path Trajectory Visualizer)</a></li>
+</ul>
 
-
-### Prerequisites
-
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
-
-
-
-### Installation
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/tumbalcain/R2045_FTC_Team_19829_Repository.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
-5. Change git remote url to avoid accidental pushes to base project
-   ```sh
-   git remote set-url origin tumbalcain/R2045_FTC_Team_19829_Repository
-   git remote -v # confirm the changes
-   ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -119,11 +74,6 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 
 <!-- CONTRIBUTING -->
 ## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
