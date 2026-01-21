@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -11,20 +14,171 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.R2045.pipelines.AprilTagWebcam;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
-@Autonomous(name="R2045_DECODE_Autonomous", group="R2045_DECODE")
+@Config
+@Autonomous(name="R2045_DECODE_Autonomous_RED_DOWN", group="R2045_DECODE")
 public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
     AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
 
-    Servo turret = null;
-    Servo hood = null;
-    DcMotorEx shooter = null;
+    // Mechanism Instantiation
+
+    // Turret Class
+    public class Turret {
+        private final Servo turret;
+        private final Servo hood;
+
+        public Turret(HardwareMap hardwareMap) {
+            turret = hardwareMap.get(Servo.class, "turret");
+            hood = hardwareMap.get(Servo.class, "hood");
+        } // end of hardwareMap
+
+        // AutoAim Action
+
+        public class AutoAim implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                Double bearing = aprilTagWebcam.getBearingToTag(24);
+                Double distance = aprilTagWebcam.getDistanceToTag(24);
+
+                if (bearing != null) {
+                    double pos = 0.5 + bearing * 0.01;
+                    turret.setPosition(Math.max(0.0, Math.min(1.0, pos)));
+                } // end of conditional
+
+                if (distance != null) {
+                    double[] shot = getShotConfig(distance);
+                    hood.setPosition(shot[0]);
+                } // end of conditional
+                return false;
+            } // end of boolean run
+        } // end of AutoAim Action
+
+        public Action autoAim() {
+            return new AutoAim();
+        } // end of autoAim() function
+    } // end of class
+
+    // Shooter Class
+    public static class Shooter {
+        private final DcMotorEx shooter;
+
+        public Shooter(HardwareMap hardwareMap) {
+            shooter = hardwareMap.get(DcMotorEx.class, "shooter");
+        } // end of hardwareMap
+
+        // Shooting Function
+
+        public class ShootBall implements Action {
+
+            private final ElapsedTime timer = new ElapsedTime();
+            private boolean started = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!started) {
+                    timer.reset();
+                    shooter.setPower(1.0);
+                    started = true;
+                } // end of conditional
+
+                if (timer.milliseconds() >= 7000) {
+                    shooter.setPower(0.0);
+                    return true;
+                } // end of conditional
+                return false;
+            } // end of boolean
+        } // end of ShootBall
+
+        public Action shootBall() {
+            return new ShootBall();
+        } // end of shootBall function
+    } // end of class
+
+    // Intake Class
+    public static class Intake {
+        private final DcMotorEx intake;
+
+        public Intake(HardwareMap hardwareMap) {
+            intake = hardwareMap.get(DcMotorEx.class, "intake");
+        } // end of hardwareMap
+
+        // Intake Action
+
+        public class IntakeConveyor implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                intake.setPower(1.0);
+                return false;
+            } // end of boolean run
+        } // end of IntakeConveyor action
+
+        public Action intakeRun() {
+            return new IntakeConveyor();
+        } // end of intakeRun function
+    } // end of class
+
+    // Stopper Class
+    public class Stopper {
+        private Servo stopper;
+
+        public Stopper(HardwareMap hardwareMap) {
+            stopper = hardwareMap.get(Servo.class, "stopper");
+        } // end of hardwareMap
+
+        // Close Stopper Action
+
+        public class StopperClose implements Action {
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                stopper.setPosition(0.0);
+                return true;
+            } // end of boolean run
+        } // end of StopperClose action
+
+        public Action stopperClose() {
+            return new StopperClose();
+        }
+
+        // Shooting Sequence Stopper Action
+
+        public class ShootingSequence implements Action {
+            private final ElapsedTime timer = new ElapsedTime();
+            private boolean started = false;
+
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!started) {
+                    timer.reset();
+                    stopper.setPosition(0.0);
+                    started = true;
+                } // end of conditional
+
+                if (timer.milliseconds() > 2000) {
+                    stopper.setPosition(1.0);
+                }
+
+                if (timer.milliseconds() >= 7000) {
+                    stopper.setPosition(0.0);
+                    return true;
+                } // end of conditional
+                return false;
+            } // end of boolean run
+        } // end of ShootingSequence action
+
+        public Action shootingSequence() {
+            return new ShootingSequence();
+        }
+
+    } // end of class
+
+    // Shooting Calibration Table
 
     double[][] shotTable = {
             // distance(cm), hoodPos, shooterPower
@@ -60,64 +214,20 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         return new double[] {shotTable[shotTable.length - 1][1], shotTable[shotTable.length - 1][2]};
     } // end of double
 
-    Action autoAim = packet -> {
-        Double bearing = aprilTagWebcam.getBearingToTag(24);
-        Double distance = aprilTagWebcam.getDistanceToTag(24);
-
-        if (bearing != null) {
-            double pos = 0.5 + bearing * 0.01;
-            turret.setPosition(Math.max(0.0, Math.min(1.0, pos)));
-        } // end of conditional
-
-        if (distance != null) {
-            double[] shot = getShotConfig(distance);
-            hood.setPosition(shot[0]);
-        } // end of conditional
-
-        return false;
-    }; // end of Action
-
-    public static class ShootBall implements Action {
-
-        private final DcMotorEx shooter;
-        private final ElapsedTime timer = new ElapsedTime();
-        private boolean started = false;
-
-        public ShootBall(DcMotorEx shooter) {
-            this.shooter = shooter;
-        } // end of whatever this thing is
-
-        @Override
-        public boolean run(TelemetryPacket packet) {
-            if (!started) {
-                timer.reset();
-                shooter.setPower(1.0);
-                started = true;
-            } // end of conditional
-
-            if (timer.milliseconds() >= 2000) {
-                shooter.setPower(0.0);
-                return true;
-            } // end of conditional
-
-            return false;
-        } // end of boolean
-    } // end of ShootBall
+    // Autonomous OpMode
 
     @Override
     public void runOpMode() throws InterruptedException {
 
         aprilTagWebcam.init(hardwareMap, telemetry);
-
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-        turret = hardwareMap.get(Servo.class, "turret");
-        hood = hardwareMap.get(Servo.class, "hood");
-
+        Shooter shooter = new Shooter(hardwareMap);
+        Turret turret = new Turret(hardwareMap);
+        Intake intake = new Intake(hardwareMap);
+        Stopper stopper = new Stopper(hardwareMap);
 
         // Declaration variables
         Pose2d beginPose = new Pose2d(11.57, -62.11, Math.toRadians(90.00));
-        Pose2d endSPOne = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
-        Pose2d endSPTwo = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
+        Pose2d lz = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
         waitForStart();
@@ -127,39 +237,56 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
         // Enter Path Implementation here
         Action pathSPOne = drive.actionBuilder(beginPose)
-                .splineTo(new Vector2d(28.50, -36.92), Math.toRadians(0.00)) // Spawn to Spike Mark 1
-                .splineTo(new Vector2d(53.06, -36.92), Math.toRadians(0.00)) // Spike Mark 1 AIS
-                .splineTo(new Vector2d(47.97, -23.42), Math.toRadians(180.00)) // Turn to LZ
-                .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
+                .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Spawn to LZ
                 .build();
         // end of pathSPOne
 
-        Action pathSPTwo = drive.actionBuilder(endSPOne)
-                .splineTo(new Vector2d(28.33, -12.19), Math.toRadians(0.00)) // LZ to Spike Mark 2
-                .splineTo(new Vector2d(53.23, -12.19), Math.toRadians(0.00)) // Spike Mark 2 AIS
-                .splineTo(new Vector2d(40.43, -20.08), Math.toRadians(180.00)) // Turn to LZ
+        Action pathSPTwo = drive.actionBuilder(lz)
+                .splineTo(new Vector2d(31.54, 12.37), Math.toRadians(0.00)) // LZ to Spike Mark 3
+                .splineTo(new Vector2d(50.08, 12.37), Math.toRadians(-0.20)) // Spike Mark 3 AIS
+                .splineTo(new Vector2d(37.10, 0.96), Math.toRadians(180.00)) // Turn to LZ
                 .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
                 .build();
         // end of pathSPTwo
 
-        Action pathSPThree = drive.actionBuilder(endSPTwo)
-                .splineTo(new Vector2d(29.03, 12.37), Math.toRadians(0.00)) // LZ to Spike Mark 3
-                .splineTo(new Vector2d(50.08, 12.37), Math.toRadians(0.00)) // Spike Mark 3 AIS
-                .splineTo(new Vector2d(37.10, 0.96), Math.toRadians(180.00)) // Turn to LZ
+        Action pathSPThree = drive.actionBuilder(lz)
+                .splineTo(new Vector2d(31.54, -12.63), Math.toRadians(0.00)) // LZ to Spike Mark 2
+                .splineTo(new Vector2d(50.08, -12.63), Math.toRadians(0.00)) // Spike Mark 2 AIS
+                .splineTo(new Vector2d(37.10, -20.08), Math.toRadians(180.00)) // Turn to LZ
                 .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
                 .build();
         // end of pathSPThree
 
-        Action ShootBall;
+        Action pathSPFour = drive.actionBuilder(lz)
+                .splineTo(new Vector2d(31.54, -36.31), Math.toRadians(0.00)) // LZ to Spike Mark 1
+                .splineTo(new Vector2d(49.21, -36.31), Math.toRadians(-0.51)) // Spike Mark 1 AIS
+                .splineTo(new Vector2d(37.10, -48.15), Math.toRadians(180.00)) // Turn to LZ
+                .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
+                .build();
+        // end of pathSPFour
+
+        // Shooter Parallel Action
+
+        Action shoot = new ParallelAction(
+                shooter.shootBall(),
+                stopper.shootingSequence()
+        );
+
         Actions.runBlocking(new ParallelAction(
-                autoAim,
+                turret.autoAim(),
+                intake.intakeRun(),
                 new SequentialAction(
                     pathSPOne,
-                    new ShootBall(shooter),
+                    shoot,
+
                     pathSPTwo,
-                    new ShootBall(shooter),
+                    shoot,
+
                     pathSPThree,
-                    new ShootBall(shooter)
+                    shoot,
+
+                    pathSPFour,
+                    shoot
                 ) // end of SequentialAction
         ));
         // end of runBlocking() function
