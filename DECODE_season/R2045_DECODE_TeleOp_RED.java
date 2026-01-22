@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
-import org.firstinspires.ftc.teamcode.R2045.pipelines.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.R2045.pipelines.TabbyTag;
 
 @TeleOp(name="R2045_DECODE_TeleOp", group="R2045_DECODE")
 public class R2045_DECODE_TeleOp_RED extends OpMode {
@@ -16,7 +16,7 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
     private IMU imu;
 
     ReusableMecanum drivePower = new ReusableMecanum();
-    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    TabbyTag tabbyTag = new TabbyTag();
     double forward, strafe, rotate;
 
     // Shooting Tuning Table
@@ -35,7 +35,7 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
     @Override
     public void init() {
 
-        aprilTagWebcam.init(hardwareMap, telemetry);
+        tabbyTag.init(hardwareMap, telemetry);
         drivePower.init(hardwareMap);
 
         // Actuator Configuration and Hardware Mapping
@@ -99,15 +99,15 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
     public void loop() {
         // Control Variable Declaration
 
-        aprilTagWebcam.update();
+        tabbyTag.update();
 
         double right_trigger = -gamepad1.right_trigger;
         double left_trigger = gamepad1.left_trigger;
 
         // Tag ID 20: Blue Alliance
         // Tag ID 24: Red Alliance
-        Double bearing = aprilTagWebcam.getBearingToTag(24);
-        Double distance = aprilTagWebcam.getDistanceToTag(24);
+        Double bearing = tabbyTag.getBearingToTag(24);
+        Double distance = tabbyTag.getDistanceToTag(24);
 
         // Turret Auto-Aim
 

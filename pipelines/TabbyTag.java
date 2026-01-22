@@ -31,7 +31,7 @@ import java.util.List;
 // aprilTagWebcam.update();
 
 
-public final class AprilTagWebcam {
+public final class TabbyTag {
 
     // List, VisionPortal, AprilTag, and Telemetry Declaration
 

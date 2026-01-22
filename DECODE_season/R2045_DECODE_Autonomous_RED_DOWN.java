@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.R2045.pipelines.AprilTagWebcam;
+import org.firstinspires.ftc.teamcode.R2045.pipelines.TabbyTag;
 
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Autonomous(name="R2045_DECODE_Autonomous_RED_DOWN", group="R2045_DECODE")
 public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
-    AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+    TabbyTag tabbyTag = new TabbyTag();
 
     // Mechanism Instantiation
 
@@ -43,8 +43,8 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         public class AutoAim implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Double bearing = aprilTagWebcam.getBearingToTag(24);
-                Double distance = aprilTagWebcam.getDistanceToTag(24);
+                Double bearing = tabbyTag.getBearingToTag(24);
+                Double distance = tabbyTag.getDistanceToTag(24);
 
                 if (bearing != null) {
                     double pos = 0.5 + bearing * 0.01;
@@ -218,7 +218,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        aprilTagWebcam.init(hardwareMap, telemetry);
+        tabbyTag.init(hardwareMap, telemetry);
         Shooter shooter = new Shooter(hardwareMap);
         Turret turret = new Turret(hardwareMap);
         Intake intake = new Intake(hardwareMap);
