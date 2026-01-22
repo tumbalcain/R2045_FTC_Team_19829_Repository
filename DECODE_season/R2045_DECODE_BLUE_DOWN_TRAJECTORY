@@ -1,30 +1,38 @@
-1.A Spawn to Spike Mark 1
-2.A Spike Mark 1 Artifact Intake Sweep
-3.A Turn to LZ
-4.A Enter LZ
+1.A Spawn to LZ
 -1.S Shoot Ball
-5.A LZ to Spike Mark 2
-6.A Spike Mark 2 Artifact Intake Sweep
-7.A Turn to LZ
-8.A Enter LZ
+2.A LZ to Spike Mark 3
+3.A Spike Mark 3 Artifact Intake Sweep
+4.A Turn to LZ
+5.A Enter LZ
 -2.S Shoot Ball
-9.A LZ to Spike Mark 3
-10.A Spike Mark 3 Artifact Intake Sweep
-11.A Turn to LZ
-12.A Enter LZ
+6.A LZ to Spike Mark 2
+7.A Spike Mark 2 Artifact Intake Sweep
+8.A Turn to LZ
+9.A Enter LZ
 -3.S Shoot Ball
+10.A LZ to Spike Mark 1
+11.A Spike Mark 1 Artifact Intake Sweep
+12.A Turn to LZ
+13.A Enter LZ
+-4.S Shoot Ball
 
 TrajectorySequence trajectory0 = drive.trajectorySequenceBuilder(new Pose2d(-11.57, -62.11, Math.toRadians(90.00)))
-.splineTo(new Vector2d(-28.50, -36.92), Math.toRadians(180.00)) // Spawn to Spike Mark 1
-.splineTo(new Vector2d(-53.06, -36.92), Math.toRadians(180.00)) // Spike Mark 1 AIS
-.splineTo(new Vector2d(-47.97, -23.42), Math.toRadians(0.00)) // Turn to LZ
-.splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
-.splineTo(new Vector2d(-28.33, -12.19), Math.toRadians(180.00)) // LZ to Spike Mark 2
-.splineTo(new Vector2d(-53.23, -12.19), Math.toRadians(180.00)) // Spike Mark 2 AIS
-.splineTo(new Vector2d(-40.43, -20.08), Math.toRadians(0.00)) // Turn to LZ
-.splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
-.splineTo(new Vector2d(-29.03, 12.37), Math.toRadians(180.00)) // LZ to Spike Mark 3
+.splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Spawn to LZ
+// Shoot Ball
+.splineTo(new Vector2d(-31.54, 12.37), Math.toRadians(180.00)) // LZ to Spike Mark 3
 .splineTo(new Vector2d(-50.08, 12.37), Math.toRadians(180.00)) // Spike Mark 3 AIS
 .splineTo(new Vector2d(-37.10, 0.96), Math.toRadians(0.00)) // Turn to LZ
 .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
+// Shoot Ball
+.splineTo(new Vector2d(-31.54, -12.63), Math.toRadians(180.00)) // LZ to Spike Mark 2
+.splineTo(new Vector2d(-50.08, -12.63), Math.toRadians(180.00)) // Spike Mark 2 AIS
+.splineTo(new Vector2d(-37.10, -20.08), Math.toRadians(0.00)) // Turn to LZ
+.splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
+// Shoot Ball
+.splineTo(new Vector2d(-31.54, -36.31), Math.toRadians(180.00)) // LZ to Spike Mark 1
+.splineTo(new Vector2d(-49.21, -36.31), Math.toRadians(180.00)) // Spike Mark 1 AIS
+.splineTo(new Vector2d(-37.10, -48.15), Math.toRadians(0.00)) // Turn to LZ
+.splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
+// Shoot Ball
 .build();
+
