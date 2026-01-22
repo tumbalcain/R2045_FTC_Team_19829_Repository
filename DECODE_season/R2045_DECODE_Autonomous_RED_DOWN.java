@@ -6,7 +6,6 @@ import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -125,8 +124,8 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     } // end of class
 
     // Stopper Class
-    public class Stopper {
-        private Servo stopper;
+    public static class Stopper {
+        private final Servo stopper;
 
         public Stopper(HardwareMap hardwareMap) {
             stopper = hardwareMap.get(Servo.class, "stopper");
@@ -194,9 +193,9 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     // Interpolation Function
     // a.k.a gay math
 
-    private double lerp (double a, double b, double t) {
+    private double linear_interpolation(double a, double b, double t) {
         return a + (b - a) * t;
-    } // end of lerp
+    } // end of linear_interpolation
 
     private double[] getShotConfig(double distance) {
         for (int i = 0; i < shotTable.length - 1; i++) {
@@ -206,8 +205,8 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
             if (distance >= A[0] && distance < B[0]) {
                 double t = (distance - A[0]) / (B[0] - A[0]);
                 return new double[] {
-                        lerp(A[1], B[1], t),
-                        lerp(A[2], B[2], t)
+                        linear_interpolation(A[1], B[1], t),
+                        linear_interpolation(A[2], B[2], t)
                 }; // end of return
             } // end of conditional
         } // end of for loop
@@ -276,6 +275,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
                 turret.autoAim(),
                 intake.intakeRun(),
                 new SequentialAction(
+                    stopper.stopperClose(),
                     pathSPOne,
                     shoot,
 
