@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.R2045.pipelines;
 
+import android.annotation.SuppressLint;
 import android.util.Size;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -18,17 +19,19 @@ import java.util.List;
 // GUIDE TO NEW PROGRAMMERS ON HOW TO USE THIS PIPELINE IN OPMODES
 
 // STEP 1: IMPORT THIS PIPELINE USING THE CODE BELOW
-// import org.firstinspires.ftc.teamcode.R2045.pipelines.AprilTagWebcam;
+// import org.firstinspires.ftc.teamcode.R2045.pipelines.TabbyTag;
+// or
+// import org.firstinspires.ftc.teamcode.TabbyTag;
 
 // STEP 2: INITIALIZE THE PIPELINE IN THE OPMODE
 // DO NOT ADD THE CODE INSIDE THE INIT() FUNCTION
-// AprilTagWebcam aprilTagWebcam = new AprilTagWebcam();
+// TabbyTag tabbyTag = new TabbyTag();
 
 // STEP 3: ADD THE CODE BELOW INSIDE THE INIT() FUNCTION
-// apriltagWebcam.init(hardwareMap, telemetry);
+// tabbyTag.init(hardwareMap, telemetry);
 
 // STEP 4: ADD THE CODE BELOW INSIDE THE LOOP() FUNCTION
-// aprilTagWebcam.update();
+// tabbyTag.update();
 
 
 public final class TabbyTag {
@@ -42,7 +45,7 @@ public final class TabbyTag {
 
     private Telemetry telemetry;
 
-    // AprilTag and VisionPortal Initilization
+    // AprilTag and VisionPortal Initialization
 
     public void init(HardwareMap hardwareMap, Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -73,12 +76,14 @@ public final class TabbyTag {
     // List of Detected AprilTags
 
     public List<AprilTagDetection> getDetectedTags() {
+        update();
         return detectedTags;
     } // end of getDetectedTag() List
 
     // Specific AprilTag Id Fetch Function
 
     public AprilTagDetection getTagBySpecificId(int id) {
+        update();
         for (AprilTagDetection detection : detectedTags) {
             if (detection.id == id) {
                 return detection;
@@ -91,6 +96,7 @@ public final class TabbyTag {
     // Specific AprilTag Id Distance Fetch Function
 
     public Double getDistanceToTag(int id) {
+        update();
         AprilTagDetection tag = getTagBySpecificId(id);
         if (tag == null) return null;
         return tag.ftcPose.z;
@@ -99,6 +105,7 @@ public final class TabbyTag {
     // Specific AprilTag Id Bearing Fetch Function
 
     public Double getBearingToTag(int id) {
+        update();
         AprilTagDetection tag = getTagBySpecificId(id);
         if (tag == null) return null;
         return tag.ftcPose.bearing;
@@ -107,6 +114,7 @@ public final class TabbyTag {
     // Specific AprilTag Id Offset Fetch Function
 
     public Double getOffsetToTag(int id) {
+        update();
         AprilTagDetection tag = getTagBySpecificId(id);
         if (tag == null) return null;
         return tag.ftcPose.x;
@@ -115,13 +123,21 @@ public final class TabbyTag {
     // Specific AprilTag Id Yaw Fetch Function
 
     public Double getYawToTag(int id) {
+        update();
         AprilTagDetection tag = getTagBySpecificId(id);
         if (tag == null) return null;
         return tag.ftcPose.yaw;
     } // end of getYawToTag() function
 
+    // Check if a specific AprilTag Id exists
+
+    public boolean hasTag(int id) {
+        return getTagBySpecificId(id) != null;
+    }
+
     // Telemetry Display Function
 
+    @SuppressLint("DefaultLocale")
     public void displayDetectionTelemetry(AprilTagDetection detectedId) {
         if (detectedId == null) {
             return;
@@ -129,9 +145,9 @@ public final class TabbyTag {
 
         if (detectedId.metadata != null) {
             telemetry.addLine(String.format("\n==== (ID %d) %s", detectedId.id, detectedId.metadata.name));
-            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detectedId.ftcPose.x, detectedId.ftcPose.y, detectedId.ftcPose.z));
+            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (cm)", detectedId.ftcPose.x, detectedId.ftcPose.y, detectedId.ftcPose.z));
             telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detectedId.ftcPose.pitch, detectedId.ftcPose.roll, detectedId.ftcPose.yaw));
-            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detectedId.ftcPose.range, detectedId.ftcPose.bearing, detectedId.ftcPose.elevation));
+            telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (cm, deg, deg)", detectedId.ftcPose.range, detectedId.ftcPose.bearing, detectedId.ftcPose.elevation));
         } else {
             telemetry.addLine(String.format("\n==== (ID %d) Unknown", detectedId.id));
             telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detectedId.center.x, detectedId.center.y));

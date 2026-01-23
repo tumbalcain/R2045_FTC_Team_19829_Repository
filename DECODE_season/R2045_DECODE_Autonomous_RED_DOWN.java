@@ -184,10 +184,10 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
             // NOTE TO PROGRAMMERS & MECHANIC:
             // AS OF 19/01/26, THIS DATA IS TEMPORARY AND SERVE AS A DUMMY.
             // WE NEED SHOOTER & HOOD TESTING AND CALIBRATION.
-            {10,  0.15, 0.65},
-            {20,  0.22, 0.72},
-            {30, 0.30, 0.80},
-            {40, 0.38, 0.90}
+            {10,  0.15},
+            {20,  0.22},
+            {30, 0.30},
+            {40, 0.38}
     }; // end of shotTable
 
     // Interpolation Function
