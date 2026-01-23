@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.R2045.pipelines.TabbyTag;
 
@@ -13,7 +12,6 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
     private DcMotorEx intake, shooter, right_lifter, left_lifter;
 
     private Servo hood, turret, stopper;
-    private IMU imu;
 
     ReusableMecanum drivePower = new ReusableMecanum();
     TabbyTag tabbyTag = new TabbyTag();
@@ -22,14 +20,14 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
     // Shooting Tuning Table
 
     double[][] shotTable = {
-        // distance(cm), hoodPos, shooterPower
-        // NOTE TO PROGRAMMERS & MECHANIC:
-        // AS OF 19/01/26, THIS DATA IS TEMPORARY AND SERVE AS A DUMMY.
-        // WE NEED SHOOTER & HOOD TESTING AND CALIBRATION.
-        {10,  0.15, 0.65},
-        {20,  0.22, 0.72},
-        {30, 0.30, 0.80},
-        {40, 0.38, 0.90}
+            // distance(cm), hoodPos
+            // NOTE TO PROGRAMMERS & MECHANIC:
+            // AS OF 19/01/26, THIS DATA IS TEMPORARY AND SERVE AS A DUMMY.
+            // WE NEED SHOOTER & HOOD TESTING AND CALIBRATION.
+            {10,  0.15},
+            {20,  0.22},
+            {30, 0.30},
+            {40, 0.38}
     }; // end of shotTable
 
     @Override
@@ -73,7 +71,7 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
     } // end of init() function
 
     // Interpolation Function
-    // a.k.a gay math
+    // stinky math
 
     private double lerp (double a, double b, double t) {
         return a + (b - a) * t;
@@ -87,23 +85,40 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
             if (distance >= A[0] && distance < B[0]) {
                 double t = (distance - A[0]) / (B[0] - A[0]);
                 return new double[] {
-                        lerp(A[1], B[1], t),
-                        lerp(A[2], B[2], t)
+                        lerp(A[1], B[1], t)
                 }; // end of return
             } // end of conditional
         } // end of for loop
         return new double[] {shotTable[shotTable.length - 1][1], shotTable[shotTable.length - 1][2]};
     } // end of double
 
+
+    // Turret Control Constants
+
+    final double TURRET_CENTER = 0.5;
+    final double TURRET_KP = 0.008; // adjust this
+    final double TURRET_DEADBAND = 1.5;
+
+    boolean useAutoAim = true;
+    boolean lastRB = false;
+    double turretPos = TURRET_CENTER;
+
     @Override
     public void loop() {
         // Control Variable Declaration
 
+        boolean rb = gamepad2.right_bumper;
+
         tabbyTag.update();
+
+        // Auto Aim Toggle
+        if (rb && !lastRB) {
+            useAutoAim = !useAutoAim;
+        } // end of conditional
+        lastRB = rb;
 
         double right_trigger = -gamepad1.right_trigger;
         double left_trigger = gamepad1.left_trigger;
-
         // Tag ID 20: Blue Alliance
         // Tag ID 24: Red Alliance
         Double bearing = tabbyTag.getBearingToTag(24);
@@ -112,8 +127,14 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         // Turret Auto-Aim
 
         if (bearing != null) {
-            double pos = 0.5 + bearing * 0.01;
-            turret.setPosition(Math.max(0.0, Math.min(1.0, pos)));
+            if (useAutoAim && bearing != null && Math.abs(bearing) > TURRET_DEADBAND) {
+                turretPos += bearing * TURRET_KP;
+            } // end of conditional
+            if (!useAutoAim && Math.abs(gamepad2.left_stick_x) > 0.1) {
+                turretPos += gamepad2.left_stick_x * 0.01;
+            } // end of conditional
+            turretPos = Math.max(0.0, Math.min(1.0, turretPos));
+            turret.setPosition(turretPos);
         } // end of conditional
 
         // Intake Control
@@ -129,11 +150,11 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         // Lifter Control
 
         if (gamepad1.dpad_up) {
-            right_lifter.setPower(1);
-            left_lifter.setPower(1);
+            right_lifter.setPower(1.0);
+            left_lifter.setPower(1.0);
         } else if (gamepad1.dpad_down) {
-            right_lifter.setPower(-1);
-            left_lifter.setPower(-1);
+            right_lifter.setPower(-1.0);
+            left_lifter.setPower(-1.0);
         } else {
             right_lifter.setPower(0);
             left_lifter.setPower(0);
@@ -141,12 +162,20 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
 
         // Shooter Control
 
-        if (gamepad1.y && distance != null) {
-            double[] shot = getShotConfig(distance);
-            hood.setPosition(shot[0]);
-            shooter.setPower(shot[1]);
+        if (gamepad2.y && distance != null) {
+            double hoodPos = getShotConfig(distance)[0];
+            hood.setPosition(hoodPos);
+            shooter.setPower(1.0);
         } else {
-            shooter.setPower(0);
+            shooter.setPower(0.0);
+        } // end of conditional
+
+        // Stopper Control
+
+        if (gamepad2.a) {
+            stopper.setPosition(1.0);
+        } else if (gamepad2.b) {
+            stopper.setPosition(0.0);
         } // end of conditional
 
         // Drivebase Control
