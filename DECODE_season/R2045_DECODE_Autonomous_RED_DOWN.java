@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
 
 import androidx.annotation.NonNull;
@@ -275,21 +276,20 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
                 turret.autoAim(),
                 intake.intakeRun(),
                 new SequentialAction(
-                    stopper.stopperClose(),
-                    pathSPOne,
-                    shoot,
+                        stopper.stopperClose(),
+                        pathSPOne,
+                        shoot,
 
-                    pathSPTwo,
-                    shoot,
+                        pathSPTwo,
+                        shoot,
 
-                    pathSPThree,
-                    shoot,
+                        pathSPThree,
+                        shoot,
 
-                    pathSPFour,
-                    shoot
+                        pathSPFour,
+                        shoot
                 ) // end of SequentialAction
         ));
         // end of runBlocking() function
     } // end of runOpMode() function
 } // end of loop() function
-
