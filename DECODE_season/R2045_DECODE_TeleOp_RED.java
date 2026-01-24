@@ -124,10 +124,10 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         Double bearing = tabbyTag.getBearingToTag(24);
         Double distance = tabbyTag.getDistanceToTag(24);
 
-        // Turret Auto-Aim
+        // Turret Auto-Aim  
 
         if (bearing != null) {
-            if (useAutoAim && bearing != null && Math.abs(bearing) > TURRET_DEADBAND) {
+            if (useAutoAim && Math.abs(bearing) > TURRET_DEADBAND) {
                 turretPos += bearing * TURRET_KP;
             } // end of conditional
             if (!useAutoAim && Math.abs(gamepad2.left_stick_x) > 0.1) {
