@@ -33,6 +33,10 @@ import java.util.List;
 // STEP 4: ADD THE CODE BELOW INSIDE THE LOOP() FUNCTION
 // tabbyTag.update();
 
+// STEP 5: ADD THE CODE BELOW INSIDE THE STOP() FUNCTION
+// OR BELOW THE while(opModeIsActive()) LOOP
+// tabbyTag.stop();
+
 
 public final class TabbyTag {
 
@@ -76,14 +80,12 @@ public final class TabbyTag {
     // List of Detected AprilTags
 
     public List<AprilTagDetection> getDetectedTags() {
-        update();
         return detectedTags;
     } // end of getDetectedTag() List
 
-    // Specific AprilTag Id Fetch Function
+    // AprilTag Id Fetch Function
 
-    public AprilTagDetection getTagBySpecificId(int id) {
-        update();
+    public AprilTagDetection getTagById(int id) {
         for (AprilTagDetection detection : detectedTags) {
             if (detection.id == id) {
                 return detection;
@@ -91,49 +93,41 @@ public final class TabbyTag {
         } // end of for loop
 
         return null;
-    } // end of getTagBySpecificId() function
+    } // end of getTagById() function
 
-    // Specific AprilTag Id Distance Fetch Function
+    // AprilTag Id Distance Fetch Function
 
-    public Double getDistanceToTag(int id) {
-        update();
-        AprilTagDetection tag = getTagBySpecificId(id);
-        if (tag == null) return null;
-        return tag.ftcPose.z;
+    public double getDistanceToTag(int id) {
+        AprilTagDetection tag = getTagById(id);
+        return (tag != null) ? tag.ftcPose.z : -1;
     } // end of getDistanceToTag() function
 
-    // Specific AprilTag Id Bearing Fetch Function
+    // AprilTag Id Bearing Fetch Function
 
-    public Double getBearingToTag(int id) {
-        update();
-        AprilTagDetection tag = getTagBySpecificId(id);
-        if (tag == null) return null;
-        return tag.ftcPose.bearing;
+    public double getBearingToTag(int id) {
+        AprilTagDetection tag = getTagById(id);
+        return (tag != null) ? tag.ftcPose.bearing : -1;
     } // end of getBearingToTag() function
 
-    // Specific AprilTag Id Offset Fetch Function
+    // AprilTag Id Offset Fetch Function
 
-    public Double getOffsetToTag(int id) {
-        update();
-        AprilTagDetection tag = getTagBySpecificId(id);
-        if (tag == null) return null;
-        return tag.ftcPose.x;
+    public double getOffsetToTag(int id) {
+        AprilTagDetection tag = getTagById(id);
+        return (tag != null) ? tag.ftcPose.x : -1;
     } // end of getOffsetToTag() function
 
-    // Specific AprilTag Id Yaw Fetch Function
+    // AprilTag Id Yaw Fetch Function
 
-    public Double getYawToTag(int id) {
-        update();
-        AprilTagDetection tag = getTagBySpecificId(id);
-        if (tag == null) return null;
-        return tag.ftcPose.yaw;
+    public double getYawToTag(int id) {
+        AprilTagDetection tag = getTagById(id);
+        return (tag != null) ? tag.ftcPose.yaw : -1;
     } // end of getYawToTag() function
 
-    // Check if a specific AprilTag Id exists
+    // Check if an AprilTag Id exists
 
     public boolean hasTag(int id) {
-        return getTagBySpecificId(id) != null;
-    }
+        return getTagById(id) != null;
+    } // end of boolean
 
     // Telemetry Display Function
 
@@ -144,12 +138,12 @@ public final class TabbyTag {
         } // end of conditional
 
         if (detectedId.metadata != null) {
-            telemetry.addLine(String.format("\n==== (ID %d) %s", detectedId.id, detectedId.metadata.name));
+            telemetry.addLine(String.format("\n==== (APRILTAG ID %d) x  ", detectedId.id, detectedId.metadata.name));
             telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (cm)", detectedId.ftcPose.x, detectedId.ftcPose.y, detectedId.ftcPose.z));
             telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detectedId.ftcPose.pitch, detectedId.ftcPose.roll, detectedId.ftcPose.yaw));
             telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (cm, deg, deg)", detectedId.ftcPose.range, detectedId.ftcPose.bearing, detectedId.ftcPose.elevation));
         } else {
-            telemetry.addLine(String.format("\n==== (ID %d) Unknown", detectedId.id));
+            telemetry.addLine(String.format("\n==== (APRILTAG ID %d) Unknown", detectedId.id));
             telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detectedId.center.x, detectedId.center.y));
         } // end of conditional
     } // end of displayDetectionTelemetry() function
