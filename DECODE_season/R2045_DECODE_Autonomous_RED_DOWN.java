@@ -1,3 +1,4 @@
+
 package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -30,38 +32,71 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
     // Turret Class
     public class Turret {
-        private final Servo turret;
-        private final Servo hood;
+        private final CRServo turret;
+
+        static final double KP = 0.1;
+        static final double DEADBAND = 1.5;
 
         public Turret(HardwareMap hardwareMap) {
-            turret = hardwareMap.get(Servo.class, "turret");
-            hood = hardwareMap.get(Servo.class, "hood");
+            turret = hardwareMap.get(CRServo.class, "turret");
         } // end of hardwareMap
 
-        // AutoAim Action
+        // Align To Tag Function
 
-        public class AutoAim implements Action {
+        public class AlignToTag implements Action {
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                Double bearing = tabbyTag.getBearingToTag(24);
-                Double distance = tabbyTag.getDistanceToTag(24);
+                double bearing = tabbyTag.getBearingToTag(24);
 
-                if (bearing != null) {
-                    double pos = 0.5 + bearing * 0.01;
-                    turret.setPosition(Math.max(0.0, Math.min(1.0, pos)));
+                if (Math.abs(bearing) < DEADBAND) {
+                    turret.setPower(0);
+                    return true;
                 } // end of conditional
 
-                if (distance != null) {
-                    double[] shot = getShotConfig(distance);
-                    hood.setPosition(shot[0]);
-                } // end of conditional
+                double power = Math.signum(bearing) * KP;
+                turret.setPower(power);
                 return false;
             } // end of boolean run
-        } // end of AutoAim Action
+        } // end of AlignToTag
 
-        public Action autoAim() {
-            return new AutoAim();
-        } // end of autoAim() function
+        public Action alignToTag() {
+            return new AlignToTag();
+        } // end of alignToTag function
+    } // end of class
+
+    // Hood Class
+
+    public class Hood {
+        private final CRServo hood;
+
+        public Hood(HardwareMap hardwareMap) {
+            hood = hardwareMap.get(CRServo.class, "hood");
+        } // end of hardwwareMap
+
+        // Angle Configuration Function
+
+        public class AngleConfig implements Action {
+            private final ElapsedTime timer = new ElapsedTime();
+            private boolean started = false;
+            @Override
+            public boolean run(@NonNull TelemetryPacket packet) {
+                if (!started) {
+                    hood.setPower(1.0);
+                    return true;
+                } // end of conditional
+
+                if (timer.milliseconds() >= 600) {
+                    hood.setPower(0.0);
+                    return true;
+                } // end of conditional
+
+                return false;
+            } // end of boolean run
+        } // end of AngleConfig action
+
+        public Action angleConfig() {
+            return new Hood.AngleConfig();
+        } // end of shootBall function
     } // end of class
 
     // Shooter Class
@@ -124,20 +159,30 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     } // end of class
 
     // Stopper Class
-    public static class Stopper {
-        private final Servo stopper;
+    public class Stopper {
+        private final CRServo stopper;
 
         public Stopper(HardwareMap hardwareMap) {
-            stopper = hardwareMap.get(Servo.class, "stopper");
+            stopper = hardwareMap.get(CRServo.class, "stopper");
         } // end of hardwareMap
 
         // Close Stopper Action
 
         public class StopperClose implements Action {
+            private final ElapsedTime timer = new ElapsedTime();
+            private boolean started = false;
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                stopper.setPosition(0.0);
-                return true;
+                if (!started) {
+                    stopper.setPower(1.0);
+                    timer.reset();
+                    started = true;
+                } // end of conditional
+                if (timer.milliseconds() >= 600) {
+                    stopper.setPower(0.0);
+                    return true;
+                } // end of conditional
+                return false;
             } // end of boolean run
         } // end of StopperClose action
 
@@ -155,16 +200,16 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
             public boolean run(@NonNull TelemetryPacket packet) {
                 if (!started) {
                     timer.reset();
-                    stopper.setPosition(0.0);
+                    stopper.setPower(-1.0);
+                    sleep(600);
+                    stopper.setPower(0.0);
                     started = true;
                 } // end of conditional
 
-                if (timer.milliseconds() > 2000) {
-                    stopper.setPosition(1.0);
-                }
-
                 if (timer.milliseconds() >= 7000) {
-                    stopper.setPosition(0.0);
+                    stopper.setPower(1.0);
+                    sleep(600);
+                    stopper.setPower(0.0);
                     return true;
                 } // end of conditional
                 return false;
@@ -177,42 +222,6 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
     } // end of class
 
-    // Shooting Calibration Table
-
-    double[][] shotTable = {
-            // distance(cm), hoodPos, shooterPower
-            // NOTE TO PROGRAMMERS & MECHANIC:
-            // AS OF 19/01/26, THIS DATA IS TEMPORARY AND SERVE AS A DUMMY.
-            // WE NEED SHOOTER & HOOD TESTING AND CALIBRATION.
-            {10,  0.15},
-            {20,  0.22},
-            {30, 0.30},
-            {40, 0.38}
-    }; // end of shotTable
-
-    // Interpolation Function
-    // a.k.a gay math
-
-    private double linear_interpolation(double a, double b, double t) {
-        return a + (b - a) * t;
-    } // end of linear_interpolation
-
-    private double[] getShotConfig(double distance) {
-        for (int i = 0; i < shotTable.length - 1; i++) {
-            double[] A = shotTable[i];
-            double[] B = shotTable[i + 1];
-
-            if (distance >= A[0] && distance < B[0]) {
-                double t = (distance - A[0]) / (B[0] - A[0]);
-                return new double[] {
-                        linear_interpolation(A[1], B[1], t),
-                        linear_interpolation(A[2], B[2], t)
-                }; // end of return
-            } // end of conditional
-        } // end of for loop
-        return new double[] {shotTable[shotTable.length - 1][1], shotTable[shotTable.length - 1][2]};
-    } // end of double
-
     // Autonomous OpMode
 
     @Override
@@ -223,6 +232,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         Turret turret = new Turret(hardwareMap);
         Intake intake = new Intake(hardwareMap);
         Stopper stopper = new Stopper(hardwareMap);
+        Hood hood = new Hood(hardwareMap);
 
         // Declaration variables
         Pose2d beginPose = new Pose2d(11.57, -62.11, Math.toRadians(90.00));
@@ -272,24 +282,27 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         );
 
         Actions.runBlocking(new ParallelAction(
-                turret.autoAim(),
                 intake.intakeRun(),
                 new SequentialAction(
-                    stopper.stopperClose(),
-                    pathSPOne,
-                    shoot,
+                        stopper.stopperClose(),
+                        hood.angleConfig(),
+                        pathSPOne,
+                        turret.alignToTag(),
+                        shoot,
 
-                    pathSPTwo,
-                    shoot,
+                        pathSPTwo,
+                        turret.alignToTag(),
+                        shoot,
 
-                    pathSPThree,
-                    shoot,
+                        pathSPThree,
+                        turret.alignToTag(),
+                        shoot,
 
-                    pathSPFour,
-                    shoot
+                        pathSPFour,
+                        turret.alignToTag(),
+                        shoot
                 ) // end of SequentialAction
         ));
         // end of runBlocking() function
     } // end of runOpMode() function
 } // end of loop() function
-
