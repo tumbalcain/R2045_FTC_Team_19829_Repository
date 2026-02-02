@@ -4,13 +4,16 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.Servo;
 
 @TeleOp(name="R2045_DECODE_TeleOp", group="R2045_DECODE")
-public class R2045_DECODE_TeleOp_RED extends OpMode {
+public class R2045_DECODE_TeleOp extends OpMode {
 
     private DcMotorEx intake, shooter, right_lifter, left_lifter;
 
-    private CRServo hood, turret, stopper;
+    private CRServo turret;
+
+    private Servo hood, stopper;
 
     ReusableMecanum drivePower = new ReusableMecanum();
     double forward, strafe, rotate;
@@ -35,12 +38,12 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         // Hood Hardware Mapping
         // Hood Servo
         // REV CRServo
-        hood = hardwareMap.get(CRServo.class, "hood");
+        hood = hardwareMap.get(Servo.class, "hood");
 
         // Stopper Hardware Mapping
         // Stopper Servo
         // REV CRServo
-        stopper = hardwareMap.get(CRServo.class, "stopper");
+        stopper = hardwareMap.get(Servo.class, "stopper");
 
         // Intake Hardware Mapping
         // Intake Actuator
@@ -54,6 +57,8 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         left_lifter = hardwareMap.get(DcMotorEx.class, "left_lifter");
     } // end of init() function
 
+    double hoodPosition = 0.42;
+
     @Override
     public void loop() {
         // Control Variable Declaration
@@ -61,7 +66,6 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         double right_trigger = -gamepad1.right_trigger;
         double left_trigger = gamepad1.left_trigger;
         double turretPower = gamepad2.left_stick_x;
-        double hoodPower = gamepad2.right_stick_y;
 
         // Turret Control
 
@@ -73,11 +77,11 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
 
         // Hood Control
 
-        if (Math.abs(hoodPower) > 0.05) {
-            hood.setPower(hoodPower * 0.3);
-        } else {
-            hood.setPower(0.0);
+        if (Math.abs(gamepad2.right_stick_y) > 0.05) {
+            hoodPosition += gamepad2.right_stick_y * 0.01;
+            hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
         }
+        hood.setPosition(hoodPosition);
 
         // Intake Control
 
@@ -113,9 +117,9 @@ public class R2045_DECODE_TeleOp_RED extends OpMode {
         // Stopper Control
 
         if (gamepad2.a) {
-            stopper.setPower(1.0);
+            stopper.setPosition(0.2); // open
         } else if (gamepad2.b) {
-            stopper.setPower(0.0);
+            stopper.setPosition(0.7); // closed
         } // end of conditional
 
         // Drivebase Control

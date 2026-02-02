@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.R2045.pipelines.TabbyTag;
 
@@ -52,7 +53,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
                     return true;
                 } // end of conditional
 
-                double power = Math.signum(bearing) * KP;
+                double power = Math.max(-0.3, Math.min(0.3, bearing * KP));
                 turret.setPower(power);
                 return false;
             } // end of boolean run
@@ -66,36 +67,38 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
     // Hood Class
 
     public static class Hood {
-        private final CRServo hood;
+        private final Servo hood;
+
+        // Tune this
+        static final double HOOD_DOWN = 0.15;
+        static final double HOOD_SHOT = 0.42;
 
         public Hood(HardwareMap hardwareMap) {
-            hood = hardwareMap.get(CRServo.class, "hood");
+            hood = hardwareMap.get(Servo.class, "hood");
         } // end of hardwareMap
 
         // Angle Configuration Function
 
         public class AngleConfig implements Action {
-            private final ElapsedTime timer = new ElapsedTime();
+            private final double position;
+            private boolean done = false;
+
+            public AngleConfig(double position) {
+                this.position = position;
+            }
 
             @Override
             public boolean run(@NonNull TelemetryPacket packet) {
-                boolean started = false;
-                if (!started) {
-                    hood.setPower(1.0);
-                    return true;
+                if (!done) {
+                    hood.setPosition(position);
+                    done = true;
                 } // end of conditional
-
-                if (timer.milliseconds() >= 600) {
-                    hood.setPower(0.0);
-                    return true;
-                } // end of conditional
-
-                return false;
+                return true;
             } // end of boolean run
         } // end of AngleConfig action
 
         public Action angleConfig() {
-            return new Hood.AngleConfig();
+            return new AngleConfig(HOOD_SHOT);
         } // end of shootBall function
     } // end of class
 
@@ -122,7 +125,7 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
                     started = true;
                 } // end of conditional
 
-                if (timer.milliseconds() >= 7000) {
+                if (timer.milliseconds() >= 5000) {
                     shooter.setPower(0.0);
                     return true;
                 } // end of conditional
@@ -145,81 +148,40 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
         // Intake Action
 
-        public class IntakeConveyor implements Action {
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
+        public Action intakeOn() {
+            return packet -> {
                 intake.setPower(1.0);
-                return false;
-            } // end of boolean run
-        } // end of IntakeConveyor action
-
-        public Action intakeRun() {
-            return new IntakeConveyor();
-        } // end of intakeRun function
+                return true;
+            };
+        }
     } // end of class
 
     // Stopper Class
-    public class Stopper {
-        private final CRServo stopper;
+    public static class Stopper {
+        private final Servo stopper;
+
+        static final double CLOSED = 0.7;
+        static final double OPEN = 0.2;
 
         public Stopper(HardwareMap hardwareMap) {
-            stopper = hardwareMap.get(CRServo.class, "stopper");
+            stopper = hardwareMap.get(Servo.class, "stopper");
         } // end of hardwareMap
 
         // Close Stopper Action
 
-        public class StopperClose implements Action {
-            private final ElapsedTime timer = new ElapsedTime();
-            private boolean started = false;
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!started) {
-                    stopper.setPower(1.0);
-                    timer.reset();
-                    started = true;
-                } // end of conditional
-                if (timer.milliseconds() >= 600) {
-                    stopper.setPower(0.0);
-                    return true;
-                } // end of conditional
-                return false;
-            } // end of boolean run
-        } // end of StopperClose action
+        public Action close() {
+            return packet -> {
+                stopper.setPosition(CLOSED);
+                return true;
+            }; // end of return
+        } // end of Action
 
-        public Action stopperClose() {
-            return new StopperClose();
-        }
-
-        // Shooting Sequence Stopper Action
-
-        public class ShootingSequence implements Action {
-            private final ElapsedTime timer = new ElapsedTime();
-            private boolean started = false;
-
-            @Override
-            public boolean run(@NonNull TelemetryPacket packet) {
-                if (!started) {
-                    timer.reset();
-                    stopper.setPower(-1.0);
-                    sleep(600);
-                    stopper.setPower(0.0);
-                    started = true;
-                } // end of conditional
-
-                if (timer.milliseconds() >= 7000) {
-                    stopper.setPower(1.0);
-                    sleep(600);
-                    stopper.setPower(0.0);
-                    return true;
-                } // end of conditional
-                return false;
-            } // end of boolean run
-        } // end of ShootingSequence action
-
-        public Action shootingSequence() {
-            return new ShootingSequence();
-        }
-
+        public Action open() {
+            return packet -> {
+                stopper.setPosition(OPEN);
+                return true;
+            }; // end of return
+        } // end of Action
     } // end of class
 
     // Autonomous OpMode
@@ -276,15 +238,16 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
 
         // Shooter Parallel Action
 
-        Action shoot = new ParallelAction(
+        Action shoot = new SequentialAction(
+                stopper.open(),
                 shooter.shootBall(),
-                stopper.shootingSequence()
+                stopper.close()
         );
 
         Actions.runBlocking(new ParallelAction(
-                intake.intakeRun(),
+                intake.intakeOn(),
                 new SequentialAction(
-                        stopper.stopperClose(),
+                        stopper.close(),
                         hood.angleConfig(),
                         pathSPOne,
                         turret.alignToTag(),
