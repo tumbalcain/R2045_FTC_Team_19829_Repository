@@ -70,7 +70,6 @@ public class R2045_DECODE_Autonomous_RED_DOWN extends LinearOpMode {
         private final Servo hood;
 
         // Tune this
-        static final double HOOD_DOWN = 0.15;
         static final double HOOD_SHOT = 0.42;
 
         public Hood(HardwareMap hardwareMap) {
