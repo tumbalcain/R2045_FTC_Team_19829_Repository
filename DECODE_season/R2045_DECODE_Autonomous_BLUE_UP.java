@@ -23,8 +23,8 @@ import org.firstinspires.ftc.teamcode.R2045.pipelines.TabbyTag;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Autonomous(name="R2045_DECODE_Autonomous_BLUE_DOWN", group="R2045_DECODE")
-public class R2045_DECODE_Autonomous_BLUE_DOWN extends LinearOpMode {
+@Autonomous(name="R2045_DECODE_Autonomous_BLUE_UP", group="R2045_DECODE")
+public class R2045_DECODE_Autonomous_BLUE_UP extends LinearOpMode {
 
     TabbyTag tabbyTag = new TabbyTag();
 
@@ -196,7 +196,7 @@ public class R2045_DECODE_Autonomous_BLUE_DOWN extends LinearOpMode {
         Hood hood = new Hood(hardwareMap);
 
         // Declaration variables
-        Pose2d beginPose = new Pose2d(-11.57, -62.11, Math.toRadians(90.00));
+        Pose2d beginPose = new Pose2d(-46.21, 57.17, Math.toRadians(-43));
         Pose2d lz = new Pose2d(-0.26, 10.26, Math.toRadians(90.00));
         MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
 
@@ -207,7 +207,7 @@ public class R2045_DECODE_Autonomous_BLUE_DOWN extends LinearOpMode {
 
         // Enter Path Implementation here
         Action pathSPOne = drive.actionBuilder(beginPose)
-                .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Spawn to LZ
+                .splineTo(new Vector2d(-0.26, 10.66), Math.toRadians(-43)) // Spawn to LZ
                 .build();
         // end of pathSPOne
 
@@ -229,7 +229,7 @@ public class R2045_DECODE_Autonomous_BLUE_DOWN extends LinearOpMode {
 
         Action pathSPFour = drive.actionBuilder(lz)
                 .splineTo(new Vector2d(-31.54, -36.31), Math.toRadians(180.00)) // LZ to Spike Mark 1
-                .splineTo(new Vector2d(-49.21, -36.31), Math.toRadians(180.00)) // Spike Mark 1 AIS
+                .splineTo(new Vector2d(-50.08, -36.31), Math.toRadians(180.00)) // Spike Mark 1 AIS
                 .splineTo(new Vector2d(-37.10, -48.15), Math.toRadians(0.00)) // Turn to LZ
                 .splineTo(new Vector2d(-0.26, 10.26), Math.toRadians(90.00)) // Enter LZ
                 .build();
