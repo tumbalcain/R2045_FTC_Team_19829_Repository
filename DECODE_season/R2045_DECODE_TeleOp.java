@@ -1,133 +1,185 @@
-package org.firstinspires.ftc.teamcode.R2045.DECODE_season;
+package org.firstinspires.ftc.teamcode.code;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-@TeleOp(name="R2045_DECODE_TeleOp", group="R2045_DECODE")
-public class R2045_DECODE_TeleOp extends OpMode {
+import org.firstinspires.ftc.teamcode.code.pipelines.ReusableMecanum;
+import org.firstinspires.ftc.teamcode.code.pipelines.ShooterPID;
 
-    private DcMotorEx intake, shooter, right_lifter, left_lifter;
+@TeleOp(name = "R2045_DECODE_TeleOp", group = "Competition")
+public class R2045_DECODE_TeleOp extends LinearOpMode {
 
-    private CRServo turret;
+    // Pipelines
+    private ReusableMecanum mecanumDrive = new ReusableMecanum();
+    private ShooterPID shooterPID = new ShooterPID();
 
-    private Servo hood, stopper;
+    // Other subsystems
+    private DcMotorEx Shooter = null;
+    private DcMotor Intake = null;
+    private Servo Hood = null;
+    private CRServo Turret = null;
+    private Servo Stopper = null;
 
-    ReusableMecanum drivePower = new ReusableMecanum();
-    double forward, strafe, rotate;
-
-    @Override
-    public void init() {
-
-        drivePower.init(hardwareMap);
-
-        // Actuator Configuration and Hardware Mapping
-
-        // Shooter Hardware Mapping
-        // Shooter Actuator
-        // REV UltraPlanetary Motors
-        shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-
-        // Turret Hardware Mapping
-        // Turret Servo
-        // REV CRServo
-        turret = hardwareMap.get(CRServo.class, "turret");
-
-        // Hood Hardware Mapping
-        // Hood Servo
-        // REV CRServo
-        hood = hardwareMap.get(Servo.class, "hood");
-
-        // Stopper Hardware Mapping
-        // Stopper Servo
-        // REV CRServo
-        stopper = hardwareMap.get(Servo.class, "stopper");
-
-        // Intake Hardware Mapping
-        // Intake Actuator
-        // REV Core Hex Motor
-        intake = hardwareMap.get(DcMotorEx.class, "intake");
-
-        // Lifter Hardware Mapping
-        // Lifter Actuator
-        // REV UltraPlanetary Motors
-        right_lifter = hardwareMap.get(DcMotorEx.class, "right_lifter");
-        left_lifter = hardwareMap.get(DcMotorEx.class, "left_lifter");
-    } // end of init() function
-
-    double hoodPosition = 0.42;
+    private DcMotor Lifter1, Lifter2 = null;
 
     @Override
-    public void loop() {
-        // Control Variable Declaration
+    public void runOpMode() {
 
-        double right_trigger = -gamepad1.right_trigger;
-        double left_trigger = gamepad1.left_trigger;
-        double turretPower = gamepad2.left_stick_x;
+        // Initialize mecanum drive pipeline
+        mecanumDrive.init(hardwareMap);
 
-        // Turret Control
+        // Initialize other subsystems
+        Shooter = hardwareMap.get(DcMotorEx.class, "Shooter");
+        Hood = hardwareMap.get(Servo.class, "Hood");
+        Turret = hardwareMap.get(CRServo.class, "Turret");
+        Intake = hardwareMap.get(DcMotor.class, "Intake");
+        Stopper = hardwareMap.get(Servo.class, "Stopper");
 
-        if (Math.abs(turretPower) > 0.5) {
-            turret.setPower(turretPower * 0.4);
-        } else {
-            turret.setPower(0.0);
+        Lifter1 = hardwareMap.get(DcMotor.class, "Lifter1");
+        Lifter2 = hardwareMap.get(DcMotor.class, "Lifter2");
+
+        // Initialize shooter PID
+        shooterPID.init(Shooter);
+
+        telemetry.addData("Status", "✓ Initialized!");
+        telemetry.addData("Mode", "Robot-Centric Drive");
+        telemetry.addData("Shooter PID", "✓ Ready");
+        telemetry.addLine();
+        telemetry.addLine("=== CONTROLS ===");
+        telemetry.addData("Drive", "Left stick: Move | Right stick: Rotate");
+        telemetry.addData("Boost", "Right Trigger");
+        telemetry.addData("Intake", "RB: In | LB: Out");
+        telemetry.addData("Shooter", "Y: High | X: Med | A: Low | B: Stop");
+        telemetry.addData("Turret", "D-pad Left/Right");
+        telemetry.addData("Hood", "D-pad Up/Down");
+        telemetry.update();
+
+        waitForStart();
+
+        while (opModeIsActive()) {
+
+            // === MECANUM DRIVE (Using ReusableMecanum Pipeline) ===
+            mecanumDrive.setBoost(gamepad1.right_trigger > 0.5);  // Enable boost with right trigger
+
+            double y = -gamepad1.left_stick_y;  // Forward/backward
+            double x = gamepad1.left_stick_x;   // Strafe left/right
+            double rx = gamepad1.right_stick_x; // Rotate
+
+            mecanumDrive.drivePower(y, x, rx);
+
+            Lifter1.setDirection(DcMotor.Direction.FORWARD);
+            Lifter2.setDirection(DcMotor.Direction.REVERSE);
+
+            // === INTAKE CONTROL ===
+            if (gamepad1.right_bumper) {
+                Intake.setPower(-1);
+            } else if (gamepad1.left_bumper) {
+                Intake.setPower(1);
+            } else {
+                Intake.setPower(0);
+            }
+
+            if (gamepad2.right_trigger > 0) {
+                Lifter1.setPower(-1);
+                Lifter2.setPower(-1);
+            } else if (gamepad2.left_trigger > 0) {
+                Lifter1.setPower(1);
+                Lifter2.setPower(1);
+            } else {
+                Lifter1.setPower(0);
+                Lifter2.setPower(0);
+            }
+
+            // === TURRET CONTROL ===
+            // === TURRET CONTROL (GAMEPAD2 LEFT STICK X) ===
+            double turretInput = gamepad2.left_stick_x;
+            double deadzone = 0.05;
+
+            if (Math.abs(turretInput) > deadzone) {
+                Turret.setPower(turretInput);
+            } else {
+                Turret.setPower(0);
+            }
+
+            // === SHOOTER CONTROL (PID) ===
+            if (gamepad2.y) {
+                shooterPID.setHighSpeed();
+            } else if (gamepad2.x) {
+                shooterPID.setMediumSpeed();
+            } else if (gamepad2.a) {
+                shooterPID.setLowSpeed();
+            } else if (gamepad2.b) {
+                shooterPID.stop();
+            }
+
+            // Update PID controller every cycle
+            shooterPID.update();
+
+            // === HOOD CONTROL ===
+            if (gamepad2.dpad_up) {
+                Hood.setPosition(-0.7);
+            } else if (gamepad2.dpad_down) {
+                Hood.setPosition(0.7);
+            }
+
+            // === STOPPER CONTROL ===
+            if (gamepad2.right_bumper) {
+                Stopper.setPosition(1);
+            } else
+                Stopper.setPosition(-1);
+
+            // === TELEMETRY ===
+            telemetry.addData("Drive Mode", "Robot-Centric");
+            telemetry.addData("Speed", mecanumDrive.isBoostActive() ? "🚀 BOOST!" : "Normal (0.5)");
+            telemetry.addData("Input", "Y: %.2f | X: %.2f | RX: %.2f", y, x, rx);
+            telemetry.addLine();
+
+            // Shooter PID Status
+            telemetry.addLine("=== SHOOTER ===");
+            telemetry.addData("Status", shooterPID.isRunning() ? "🔥 RUNNING" : "⏸ STOPPED");
+            telemetry.addData("Target RPM", "%.0f", shooterPID.getTargetRPM());
+            telemetry.addData("Current RPM", "%.0f", shooterPID.getCurrentRPM());
+            telemetry.addData("Power", "%.2f", shooterPID.getCurrentPower());
+            telemetry.addData("Error", "%.0f RPM", shooterPID.getError());
+
+            if (shooterPID.isRunning()) {
+                if (shooterPID.isAtSpeed()) {
+                    telemetry.addData("Speed Status", "✓ AT SPEED!");
+                } else {
+                    telemetry.addData("Speed Status", "⟳ Ramping up...");
+                }
+            }
+            telemetry.addLine();
+
+            // Other systems
+            telemetry.addData("Ii ntake", Intake.getPower() > 0 ? "⬆ OUT" : Intake.getPower() < 0 ? "⬇ IN" : "⏸ OFF");
+            telemetry.addData("Turret", Turret.getPower() != 0 ? "↔ MOVING" : "⏸ STOPPED");
+            telemetry.addData("Hood", "%.2f", Hood.getPosition());
+            telemetry.addData("Stopper", "%.2f", Stopper.getPosition());
+            telemetry.addLine();
+
+            // === MOTOR ENCODERS ===
+            telemetry.addLine("=== DRIVEBASE ENCODERS ===");
+            telemetry.addData("LF", "%d", mecanumDrive.getLeftFrontEncoder());
+            telemetry.addData("LB", "%d", mecanumDrive.getLeftBackEncoder());
+            telemetry.addData("RF", "%d", mecanumDrive.getRightFrontEncoder());
+            telemetry.addData("RB", "%d", mecanumDrive.getRightBackEncoder());
+            telemetry.addLine();
+
+            telemetry.addLine("=== OTHER ENCODERS ===");
+            telemetry.addData("Shooter", "%d", Shooter.getCurrentPosition());
+            telemetry.addData("Intake", "%d", Intake.getCurrentPosition());
+
+            telemetry.update();
         }
 
-        // Hood Control
-
-        if (Math.abs(gamepad2.right_stick_y) > 0.05) {
-            hoodPosition += gamepad2.right_stick_y * 0.01;
-            hoodPosition = Math.max(0.0, Math.min(1.0, hoodPosition));
-        }
-        hood.setPosition(hoodPosition);
-
-        // Intake Control
-
-        if (right_trigger > left_trigger) {
-            intake.setPower(right_trigger);
-        } else if (left_trigger > right_trigger) {
-            intake.setPower(left_trigger);
-        } else {
-            intake.setPower(0.0);
-        } // end of conditional
-
-        // Lifter Control
-
-        if (gamepad1.dpad_up) {
-            right_lifter.setPower(1.0);
-            left_lifter.setPower(1.0);
-        } else if (gamepad1.dpad_down) {
-            right_lifter.setPower(-1.0);
-            left_lifter.setPower(-1.0);
-        } else {
-            right_lifter.setPower(0.0);
-            left_lifter.setPower(0.0);
-        } // end of conditional
-
-        // Shooter Control
-
-        if (gamepad2.y) {
-            shooter.setPower(1.0);
-        } else {
-            shooter.setPower(0.0);
-        } // end of conditional
-
-        // Stopper Control
-
-        if (gamepad2.a) {
-            stopper.setPosition(0.2); // open
-        } else if (gamepad2.b) {
-            stopper.setPosition(0.7); // closed
-        } // end of conditional
-
-        // Drivebase Control
-
-        forward = gamepad1.left_stick_y;
-        strafe = gamepad1.left_stick_x;
-        rotate = gamepad1.right_stick_x;
-
-        drivePower.driveFieldRelative(forward, strafe, rotate);
-    } // end of loop() function
-} // end of opMode()
+        // Cleanup
+        mecanumDrive.stop();
+        shooterPID.stop();
+    }
+}
